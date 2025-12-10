@@ -9,6 +9,7 @@ const imageSizeSchema = new Schema({
 });
 
 const imageMetadataSchema = new Schema<IImageMetadata>({
+  _id: { type: String, required: true }, // Allow UUID strings as _id
   userId: { type: String, required: true, index: true },
   originalName: { type: String, required: true },
   status: {
