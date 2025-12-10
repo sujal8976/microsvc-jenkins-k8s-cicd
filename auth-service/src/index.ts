@@ -15,7 +15,7 @@ app.use(express.json());
 connectDB();
 
 // Routes
-app.use("/auth", authRoutes);
+app.use("/api/auth", authRoutes);
 
 // Health check
 app.get("/health", (req, res) => {

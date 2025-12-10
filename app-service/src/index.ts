@@ -9,7 +9,10 @@ dotenv.config();
 
 const app: Express = express();
 const PORT = process.env.PORT || 3002;
-const frontendPath = path.join(__dirname, "../../frontend/build");
+const frontendPath = path.join(
+  __dirname,
+  process.env.NODE_ENV === "production" ? "../public" : "../../frontend/build"
+);
 
 // Middleware
 app.use(express.json());
