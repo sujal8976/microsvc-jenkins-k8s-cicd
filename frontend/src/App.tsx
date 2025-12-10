@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import Login from "./components/Login.tsx";
 import Register from "./components/Register.tsx";
@@ -28,20 +28,12 @@ function App() {
         };
   });
 
-  const [currentView, setCurrentView] = useState<"login" | "register" | "app">(
-    () => {
-      const stored = localStorage.getItem("authState");
-      return stored ? "app" : "login";
-    }
-  );
-
+  const [currentView, setCurrentView] = useState<"login" | "register">("login");
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Sync authState to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("authState", JSON.stringify(authState));
-    if (authState.isLoggedIn) {
-      setCurrentView("app");
-    }
   }, [authState]);
 
   const handleLogin = (loginData: any) => {
@@ -65,6 +57,7 @@ function App() {
   };
 
   const handleLogout = () => {
+    // Clear all auth data completely
     setAuthState({
       isLoggedIn: false,
       accessToken: null,
@@ -72,16 +65,14 @@ function App() {
       userId: null,
       email: null,
     });
-    localStorage.removeItem("authState");
+    // Clear localStorage to force fresh login
+    localStorage.clear();
+    // Reset view to login
     setCurrentView("login");
   };
 
-  const handleImageUploaded = () => {
-    setRefreshKey((prev) => prev + 1);
-  };
-
   const axiosInstance = axios.create({
-    baseURL: "/",
+    baseURL: window.location.origin,
     headers: {
       "Content-Type": "application/json",
     },
@@ -91,43 +82,36 @@ function App() {
     if (authState.accessToken) {
       config.headers.Authorization = `Bearer ${authState.accessToken}`;
     }
+    console.log("Request:", config.method?.toUpperCase(), config.url);
     return config;
   });
 
   axiosInstance.interceptors.response.use(
-    (response) => response,
+    (response) => {
+      console.log("Response:", response.status, response.config.url);
+      return response;
+    },
     async (error) => {
       const originalRequest = error.config;
+      console.error(
+        "Response Error:",
+        error.response?.status,
+        originalRequest?.url,
+        error.message
+      );
 
-      if (
-        error.response?.status === 401 &&
-        !originalRequest._retry &&
-        authState.refreshToken
-      ) {
-        originalRequest._retry = true;
-
-        try {
-          const response = await axios.post("/api/auth/refresh", {
-            refreshToken: authState.refreshToken,
-          });
-
-          const newAccessToken = response.data.accessToken;
-          setAuthState((prev) => ({
-            ...prev,
-            accessToken: newAccessToken,
-          }));
-
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-          return axiosInstance(originalRequest);
-        } catch (refreshError) {
-          handleLogout();
-          return Promise.reject(refreshError);
-        }
+      if (error.response?.status === 401) {
+        console.error("Unauthorized - logging out");
+        handleLogout();
       }
 
       return Promise.reject(error);
     }
   );
+
+  const handleImageUploaded = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
 
   return (
     <div className="App">
@@ -142,21 +126,22 @@ function App() {
       </header>
 
       <main className="App-main">
-        {currentView === "login" && !authState.isLoggedIn && (
-          <Login
-            onLogin={handleLogin}
-            onSwitchToRegister={() => setCurrentView("register")}
-          />
-        )}
-
-        {currentView === "register" && !authState.isLoggedIn && (
-          <Register
-            onRegister={handleRegister}
-            onSwitchToLogin={() => setCurrentView("login")}
-          />
-        )}
-
-        {currentView === "app" && authState.isLoggedIn && (
+        {!authState.isLoggedIn ? (
+          <>
+            {currentView === "login" && (
+              <Login
+                onLogin={handleLogin}
+                onSwitchToRegister={() => setCurrentView("register")}
+              />
+            )}
+            {currentView === "register" && (
+              <Register
+                onRegister={handleRegister}
+                onSwitchToLogin={() => setCurrentView("login")}
+              />
+            )}
+          </>
+        ) : (
           <div className="app-content">
             <ImageUpload
               axiosInstance={axiosInstance}

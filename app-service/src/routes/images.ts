@@ -97,7 +97,15 @@ router.post(
       });
     } catch (error) {
       console.error("Upload error:", error);
-      res.status(500).json({ error: "Upload failed" });
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error("Upload error details:", {
+        message: errorMsg,
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      res.status(500).json({
+        error: "Upload failed",
+        details: process.env.NODE_ENV === "development" ? errorMsg : undefined,
+      });
     }
   }
 );

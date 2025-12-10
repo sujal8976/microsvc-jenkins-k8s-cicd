@@ -5,7 +5,6 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
-	"strings"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -73,13 +72,8 @@ func proxyRequest(serviceURL string) gin.HandlerFunc {
 		}
 
 		proxy := httputil.NewSingleHostReverseProxy(target)
-
-		// Modify the request path to remove /api prefix
-		originalPath := c.Request.URL.Path
-		if strings.HasPrefix(originalPath, "/api") {
-			c.Request.URL.Path = strings.TrimPrefix(originalPath, "/api")
-		}
-
+		// Preserve the full path (don't strip /api) since the app-service
+		// routes are registered as /api/images/*, not /images/*
 		proxy.ServeHTTP(c.Writer, c.Request)
 	}
 }

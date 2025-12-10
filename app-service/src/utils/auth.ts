@@ -7,7 +7,7 @@ export const verifyToken = async (
   token: string
 ): Promise<TokenPayload | null> => {
   try {
-    const response = await axios.post(`${authServiceUrl}/auth/verify`, {
+    const response = await axios.post(`${authServiceUrl}/api/auth/verify`, {
       token,
     });
 
@@ -22,7 +22,7 @@ export const verifyToken = async (
 
     return null;
   } catch (error) {
-    console.error("Token verification failed:", error);
+    console.error("Token verification failed:");
     return null;
   }
 };
@@ -31,7 +31,7 @@ export const refreshAccessToken = async (
   refreshToken: string
 ): Promise<string | null> => {
   try {
-    const response = await axios.post(`${authServiceUrl}/auth/refresh`, {
+    const response = await axios.post(`${authServiceUrl}/api/auth/refresh`, {
       refreshToken,
     });
 
