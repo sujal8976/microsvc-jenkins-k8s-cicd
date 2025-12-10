@@ -20,6 +20,7 @@ yarn.lock
 # Build
 dist/
 build/
+public/
 *.log
 npm-debug.log*
 
