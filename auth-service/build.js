@@ -15,7 +15,7 @@ esbuild.build({
   outfile: 'dist/index.js',
   external: [],  // Bundle everything, no externals
   minify: true,
-  sourcemap: true,
+  sourcemap: false,
 }).then(() => {
   console.log('✅ Build completed successfully!');
   console.log('📦 Bundled server: dist/index.js');

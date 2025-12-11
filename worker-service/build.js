@@ -18,7 +18,7 @@ esbuild
     // Keep them as runtime `require()` so native .node binaries load correctly.
     external: ["sharp"],
     minify: true,
-    sourcemap: true,
+    sourcemap: false,
   })
   .then(() => {
     console.log("✅ Build completed successfully!");
