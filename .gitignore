@@ -51,3 +51,7 @@ coverage/
 __pycache__/
 *.py[cod]
 *$py.class
+
+# helm values
+helm/values
+helm/secrets
