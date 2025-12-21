@@ -1,0 +1,13 @@
+Worker Service Deployment Instructions
+
+This is a background worker service with no exposed HTTP endpoints.
+
+1. Check deployment status:
+   kubectl get pods -n {{ .Release.Namespace }} -l app.kubernetes.io/name={{ include "worker-service.name" . }}
+
+2. View worker logs:
+   kubectl logs -f deployment/{{ include "worker-service.fullname" . }} -n {{ .Release.Namespace }}
+
+3. Worker service connects to:
+   - MongoDB: mongodb://gallery-user:gallery-user-password@mongodb:27017/image-gallery
+   - Redis: redis-master:6379

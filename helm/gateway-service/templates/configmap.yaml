@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Chart.Name }}-config"
+  labels:
+    app: gateway-service
+    chart: {{ .Chart.Name }}
+data:
+  PORT: "{{ .Values.env.port }}"
+  AUTH_SERVICE_URL: "{{ .Values.env.authService }}"
+  APP_SERVICE_URL: "{{ .Values.env.appService }}"
+  NODE_ENV: "{{ .Values.env.nodeEnv }}"
+  LOG_LEVEL: "info"
+  MAX_FILE_SIZE: "104857600"

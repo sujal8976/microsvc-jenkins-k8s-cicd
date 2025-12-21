@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Chart.Name }}-config"
+  labels:
+    app: app-service
+    chart: {{ .Chart.Name }}
+data:
+  NODE_ENV: "{{ .Values.env.nodeEnv }}"
+  PORT: "{{ .Values.env.port }}"
+  LOG_LEVEL: "info"
+  MAX_FILE_SIZE: "104857600"
+  AUTH_SERVICE_URL: "{{ .Values.env.authServiceUrl }}"
+  REDIS_HOST: "{{ .Values.env.redis.host }}"
+  REDIS_PORT: "{{ .Values.env.redis.port }}"

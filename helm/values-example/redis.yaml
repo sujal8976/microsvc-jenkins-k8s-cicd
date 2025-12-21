@@ -1,0 +1,75 @@
+# Bitnami Redis - Replication Configuration with Alpine
+
+# Architecture: replication (master + replicas)
+architecture: replication
+
+# Authentication
+auth:
+  enabled: true
+  password: "change-me-secure-password"
+
+# Master persistence
+master:
+  persistence:
+    enabled: true
+    size: 512Mi
+    storageClass: ""
+
+# Replica configuration
+replica:
+  persistence:
+    enabled: true
+    size: 512Mi
+    storageClass: ""
+
+# Resource limits
+master:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+replica:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 6379
+
+# Pod security
+podSecurityContext:
+  fsGroup: 1001
+
+securityContext:
+  runAsUser: 1001
+  runAsNonRoot: true
+
+# Health checks
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 6
+
+# Metrics disabled
+metrics:
+  enabled: false
