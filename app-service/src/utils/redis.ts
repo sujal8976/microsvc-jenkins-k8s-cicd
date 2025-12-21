@@ -4,12 +4,14 @@ import { v4 as uuidv4 } from "uuid";
 
 const redisHost = process.env.REDIS_HOST || "localhost";
 const redisPort = parseInt(process.env.REDIS_PORT || "6379");
+const redisPassword = process.env.REDIS_PASSWORD || "redis-master";
 
 export const redisClient = createClient({
   socket: {
     host: redisHost,
     port: redisPort,
   },
+  password: redisPassword,
 });
 
 export const connectRedis = async () => {

@@ -3,12 +3,14 @@ import { ResizeJob } from "../types";
 
 const redisHost = process.env.REDIS_HOST || "localhost";
 const redisPort = parseInt(process.env.REDIS_PORT || "6379");
+const redisPassword = process.env.REDIS_PASSWORD || "password";
 
 export const redisClient = createClient({
   socket: {
     host: redisHost,
     port: redisPort,
   },
+  password: redisPassword,
 });
 
 export const connectRedis = async () => {
