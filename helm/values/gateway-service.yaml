@@ -1,4 +1,4 @@
-# Default values for auth-service.
+# Default values for gateway-service.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -7,7 +7,7 @@ replicaCount: 1
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
-  repository: devsujal/auth-service
+  repository: devsujal/gateway-service
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
@@ -38,12 +38,10 @@ podAnnotations: {}
 # For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 podLabels: {}
 
-podSecurityContext:
-  {}
+podSecurityContext: {}
   # fsGroup: 2000
 
-securityContext:
-  {}
+securityContext: {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -54,36 +52,32 @@ securityContext:
 # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
   # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
-  type: ClusterIP
+  type: LoadBalancer
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
-  port: 3001
+  port: 80
+  targetPort: 8000
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
   enabled: false
-  className: ""
+  className: "nginx"
   annotations:
-    {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
   hosts:
-    - host: chart-example.local
+    - host: "image.com"
       paths:
         - path: /
-          pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+          pathType: Prefix
+          
+  tls:
+    - secretName: gateway-tls
+      hosts:
+        - "image.com"
 
 resources:
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   limits:
-    cpu: 100m
-    memory: 128Mi
+    cpu: 300m
+    memory: 256Mi
   requests:
     cpu: 100m
     memory: 128Mi
@@ -95,16 +89,12 @@ livenessProbe:
     port: http
   initialDelaySeconds: 10
   periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 3
 readinessProbe:
   httpGet:
     path: /health
     port: http
   initialDelaySeconds: 5
   periodSeconds: 5
-  timeoutSeconds: 3
-  failureThreshold: 2
 
 # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:
@@ -113,6 +103,14 @@ autoscaling:
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+volumeMounts: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
 
 # Additional volumes on the output Deployment definition.
 volumes: []
@@ -134,12 +132,7 @@ tolerations: []
 affinity: {}
 
 env:
+  port: 8000
   nodeEnv: "production"
-  port: 3001
-  mongo:
-    uri: mongodb://user:password@mongodb/image
-  jwt:
-    secret: "secret"
-    refreshSecret: "refresh-secret"
-    accessExpire: "15m"
-    refreshExpire: "7d"
+  authService: "http://auth-service:3001"
+  appService: "http://app-service:3002"

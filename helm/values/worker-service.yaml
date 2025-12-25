@@ -127,18 +127,10 @@ tolerations: []
 affinity: {}
 
 env:
-  mongo:
-    uri: "mongodb://user:password@mongodb:27017/image"
+  nodeEnv: production
 
   redis:
-    password: change-me-secure-password # ← CHANGE THIS to secure password
     host: redis-master
     port: "6379"
 
   authServiceUrl: http://auth-service:3001
-
-  aws:
-    region: "ap-south-1"
-    s3Bucket: "microsvc-image-processed-bucket"
-    accessKeyId: "secret"
-    secretAccessKey: "secret"

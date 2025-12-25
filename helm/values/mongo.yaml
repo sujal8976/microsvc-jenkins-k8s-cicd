@@ -4,19 +4,10 @@ architecture: standalone
 # Number of replicas
 replicaCount: 1
 
-# Authentication
-auth:
-  enabled: true
-  rootUser: admin
-  rootPassword: "rootpassword"
-  username: user
-  password: "password"
-  database: image
-
 # Persistence configuration
 persistence:
   enabled: true
-  storageClass: "" # Use your storage class
+  storageClass: ""
   size: 1Gi # PVC size
   # volumeSize for PV: 5Gi
 
