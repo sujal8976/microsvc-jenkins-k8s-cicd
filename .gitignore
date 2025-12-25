@@ -52,6 +52,5 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# helm values
-helm/values
+# helm secretsvalues
 helm/secrets
