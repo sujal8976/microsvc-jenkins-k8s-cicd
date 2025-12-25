@@ -10,3 +10,5 @@ data:
   LOG_LEVEL: "info"
   MAX_FILE_SIZE: "104857600"
   AUTH_SERVICE_URL: "{{ .Values.env.authServiceUrl }}"
+  REDIS_HOST: "{{ .Values.env.redis.host }}"
+  REDIS_PORT: "{{ .Values.env.redis.port }}"
