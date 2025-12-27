@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     DOCKER_REGISTRY = "docker.io"
-    DOCKER_REPO     = "sujalgupta"
+    DOCKER_REPO     = "devsujal"
     KUBE_NAMESPACE  = "microservices"
     HELM_BASE_PATH  = "helm"
   }
@@ -65,6 +65,13 @@ def deployService(serviceName) {
   def chartPath = "${HELM_BASE_PATH}/${serviceName}"
   def valuesFile = "${HELM_BASE_PATH}/values/${serviceName}.yaml"
 
+  def SERVICE_SECRET_CREDENTIALS = [
+    'app-service'    : 'app-service-secrets',
+    'auth-service'   : 'auth-service-secrets',
+    'gateway-service': 'gateway-service-secrets',
+    'worker-service' : 'worker-service-secrets'
+  ]
+
   stage("Deploy ${serviceName}") {
 
     stage("${serviceName} - Test") {
@@ -74,7 +81,7 @@ def deployService(serviceName) {
 
     stage("${serviceName} - Build Docker") {
       sh """
-        docker build -t ${imageName}:${imageTag} ${serviceName}
+        docker build -f ${serviceName}/Dockerfile -t ${imageName}:${imageTag} ${serviceName} .
         docker tag ${imageName}:${imageTag} ${imageName}:latest
       """
     }
@@ -97,6 +104,9 @@ def deployService(serviceName) {
       withCredentials([file(
         credentialsId: 'kubeconfig',
         variable: 'KUBECONFIG_FILE'
+      ), file(
+        credentialsId: SERVICE_SECRET_CREDENTIALS[serviceName],
+        variable: 'SECRETS_FILE'
       )]) {
         sh """
           export KUBECONFIG=\$KUBECONFIG_FILE
@@ -105,8 +115,7 @@ def deployService(serviceName) {
             --namespace ${KUBE_NAMESPACE} \
             --create-namespace \
             -f ${valuesFile} \
-            --set image.repository=${imageName} \
-            --set image.tag=${imageTag}
+            -f ${SECRETS_FILE}
         """
       }
     }
