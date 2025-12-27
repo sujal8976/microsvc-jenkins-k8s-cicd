@@ -25,3 +25,5 @@ app.get("/health", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Auth service listening on port ${PORT}`);
 });
+
+//test comment
