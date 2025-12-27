@@ -81,7 +81,7 @@ def deployService(serviceName) {
 
     stage("${serviceName} - Build Docker") {
       sh """
-        docker build -f ${serviceName}/Dockerfile -t ${imageName}:${imageTag} ${serviceName} .
+        docker build -f ${serviceName}/Dockerfile -t ${imageName}:${imageTag} .
         docker tag ${imageName}:${imageTag} ${imageName}:latest
       """
     }
