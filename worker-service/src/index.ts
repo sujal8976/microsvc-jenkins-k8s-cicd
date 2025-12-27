@@ -95,3 +95,5 @@ startWorker().catch((error) => {
   console.error("Worker startup error:", error);
   process.exit(1);
 });
+
+// test comment
