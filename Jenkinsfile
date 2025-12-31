@@ -108,6 +108,10 @@ def deployService(serviceName) {
         file(credentialsId: SERVICE_SECRET_CREDENTIALS[serviceName], variable: 'SECRETS_FILE')
       ]) {
         sh """
+          export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+          export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          export AWS_DEFAULT_REGION=ap-south-1
+          
           export KUBECONFIG=\$KUBECONFIG_FILE
 
           helm upgrade --install ${serviceName} ${chartPath} \
