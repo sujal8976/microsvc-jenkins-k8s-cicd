@@ -101,18 +101,12 @@ def deployService(serviceName) {
     }
 
     stage("${serviceName} - Helm Deploy") {
-      environment {
-        AWS_ACCESS_KEY_ID = credentials('eks-jenkins-user-access-key')
-        AWS_SECRET_ACCESS_KEY = credentials('eks-jenkins-user-secret-key')
-      }
-
-      withCredentials([file(
-        credentialsId: 'kubeconfig',
-        variable: 'KUBECONFIG_FILE'
-      ), file(
-        credentialsId: SERVICE_SECRET_CREDENTIALS[serviceName],
-        variable: 'SECRETS_FILE'
-      )]) {
+      withCredentials([
+        string(credentialsId: 'eks-jenkins-user-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+        string(credentialsId: 'eks-jenkins-user-secret-key', variable: 'AWS_SECRET_ACCESS_KEY'),
+        file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE'),
+        file(credentialsId: SERVICE_SECRET_CREDENTIALS[serviceName], variable: 'SECRETS_FILE')
+      ]) {
         sh """
           export KUBECONFIG=\$KUBECONFIG_FILE
 
