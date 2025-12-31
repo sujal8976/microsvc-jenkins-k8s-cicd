@@ -7,7 +7,7 @@ replicaCount: 1
 # Persistence configuration
 persistence:
   enabled: true
-  storageClass: ""
+  storageClass: "gp2"
   size: 1Gi # PVC size
   # volumeSize for PV: 5Gi
 
