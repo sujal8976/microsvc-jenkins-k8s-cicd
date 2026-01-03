@@ -104,15 +104,15 @@ def deployService(serviceName) {
       withCredentials([
         string(credentialsId: 'eks-jenkins-user-access-key', variable: 'AWS_ACCESS_KEY_ID'),
         string(credentialsId: 'eks-jenkins-user-secret-key', variable: 'AWS_SECRET_ACCESS_KEY'),
-        file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE'),
-        file(credentialsId: SERVICE_SECRET_CREDENTIALS[serviceName], variable: 'SECRETS_FILE')
+        file(credentialsId: SERVICE_SECRET_CREDENTIALS[serviceName], variable: 'SECRETS_FILE'),
+        string(credentialsId: 'eks-cluster-name', variable: 'EKS_CLUSTER_NAME')
       ]) {
         sh """
           export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
           export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
           export AWS_DEFAULT_REGION=ap-south-1
           
-          export KUBECONFIG=\$KUBECONFIG_FILE
+          aws eks update-kubeconfig --name ${EKS_CLUSTER_NAME} --region ap-south-1
 
           helm upgrade --install ${serviceName} ${chartPath} \
             --namespace ${KUBE_NAMESPACE} \
