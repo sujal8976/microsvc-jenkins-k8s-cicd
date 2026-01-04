@@ -26,8 +26,7 @@ The project is **designed specifically for learning DevOps, AWS, and Kubernetes*
 ### Microservices Architecture
 
 ```
-[PLACEHOLDER: Insert Microservices Architecture Diagram]
-- Visual text flow showing Frontend → Gateway → Services → Databases
+
 ```
 
 ```
@@ -66,10 +65,7 @@ The project is **designed specifically for learning DevOps, AWS, and Kubernetes*
 
 ### DevOps Architecture
 
-```
-[PLACEHOLDER: Insert DevOps Architecture Diagram]
-- Visual showing Local → Jenkins → EKS Cluster → Production
-```
+![DevOps Architecture Diagram](./assets/architecture_diagram.png)
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
