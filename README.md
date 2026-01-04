@@ -32,16 +32,16 @@ The project is **designed specifically for learning DevOps, AWS, and Kubernetes*
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     FRONTEND (React)                         │
-│                  http://localhost:8080                       │
+│                     FRONTEND (React)                        │
+│                  http://localhost:8080                      │
 └────────────────────────┬────────────────────────────────────┘
                          │
          ┌───────────────┴───────────────┐
          │   GATEWAY SERVICE (Go/Gin)    │
          │  Port 8080 - API Routing      │
-         └──────┬──────────────┬──────────┘
+         └──────┬──────────────┬─────────┘
                 │              │
-    ┌───────────▼────┐  ┌─────▼──────────────┐
+    ┌───────────▼────┐  ┌──────▼─────────────┐
     │ AUTH SERVICE   │  │  APP SERVICE       │
     │ Port 3001      │  │  Port 3002         │
     │ • Register     │  │  • Upload          │
@@ -51,7 +51,7 @@ The project is **designed specifically for learning DevOps, AWS, and Kubernetes*
              │                   │
       ┌──────┴────────┬──────────┴──────────┐
       │               │                     │
-    ┌─▼────────┐  ┌──▼────┐  ┌────────────▼──┐
+    ┌─▼────────┐  ┌───▼───┐  ┌──────────────▼─┐
     │ MongoDB  │  │ Redis │  │   AWS S3       │
     │(Users)   │  │(Queue)│  │  (Images)      │
     └──────────┘  └───┬───┘  └────────────────┘
@@ -73,8 +73,8 @@ The project is **designed specifically for learning DevOps, AWS, and Kubernetes*
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                      GIT REPOSITORY                           │
-│                   (GitHub/GitLab)                             │
+│                      GIT REPOSITORY                          │
+│                   (GitHub/GitLab)                            │
 └──────────────────────┬───────────────────────────────────────┘
                        │ (Webhook Trigger)
                        │
@@ -84,22 +84,22 @@ The project is **designed specifically for learning DevOps, AWS, and Kubernetes*
          │ • Run Tests                │
          │ • Push to Registry         │
          │ • Deploy to EKS            │
-         └──────────┬──────────────────┘
+         └──────────┬─────────────────┘
                     │
     ┌───────────────┴────────────────┐
     │      AWS REGION (us-west-2)    │
     │                                │
-    │  ┌────────────────────────┐   │
-    │  │  VPC (Private Subnets) │   │
-    │  │                        │   │
-    │  │  ┌──────────────────┐  │   │
-    │  │  │   EKS CLUSTER    │  │   │
-    │  │  │ • Master Nodes   │  │   │
-    │  │  │ • Worker Nodes   │  │   │
-    │  │  │ • Auto-scaling   │  │   │
-    │  │  └──────────────────┘  │   │
-    │  │                        │   │
-    │  └────────────────────────┘   │
+    │  ┌────────────────────────┐    │
+    │  │  VPC (Private Subnets) │    │
+    │  │                        │    │
+    │  │  ┌──────────────────┐  │    │
+    │  │  │   EKS CLUSTER    │  │    │
+    │  │  │ • Master Nodes   │  │    │
+    │  │  │ • Worker Nodes   │  │    │
+    │  │  │ • Auto-scaling   │  │    │
+    │  │  └──────────────────┘  │    │
+    │  │                        │    │
+    │  └────────────────────────┘    │
     │                                │
     │  ┌──────────────┐              │
     │  │  S3 Buckets  │              │
