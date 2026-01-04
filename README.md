@@ -1,703 +1,669 @@
-# Multi-Resolution Image Generator - Microservices Architecture
+# Multi-Resolution Image Generator - Microservices Platform
 
-A complete microservices-based image processing system with multi-resolution output support. Users can upload images and get optimized versions in multiple resolutions (thumbnail, small, medium, large, original) stored on AWS S3.
+> **A complete DevOps learning platform** demonstrating modern cloud-native application architecture with AWS, Kubernetes, Jenkins, Docker, and Helm.
+
+![Status](https://img.shields.io/badge/Status-Production%20Ready-green) ![License](https://img.shields.io/badge/License-MIT-blue) ![Version](https://img.shields.io/badge/Version-1.0.0-blue)
+
+---
+
+## 📌 Project Overview
+
+This is a **complete end-to-end microservices application** that showcases:
+
+- ✅ **Multi-Resolution Image Processing**: Upload once, automatically generate 5 optimized resolutions
+- ✅ **Microservices Architecture**: 5 independent services with clear separation of concerns
+- ✅ **DevOps Practices**: Jenkins CI/CD, Kubernetes orchestration, Helm package management
+- ✅ **Cloud Integration**: AWS S3 storage, AWS EKS, IAM security
+- ✅ **Containerization**: Docker for local development, multi-stage builds
+- ✅ **Production-Ready**: Auto-scaling, health checks, error handling
+
+The project is **designed specifically for learning DevOps, AWS, and Kubernetes** while building a real, functional application.
+
+---
 
 ## 🏗️ Architecture Overview
 
+### Microservices Architecture
+
 ```
-┌─────────────┐
-│  Frontend   │  (React)
-│  (React)    │
-└──────┬──────┘
-       │
-┌──────▼────────────────────┐
-│  Gateway Service (Gin)    │  (Port 8080)
-│  - CORS, Rate Limiting    │
-│  - Request Routing        │
-└──────┬────────┬───────────┘
-       │        │
-   ┌───▼──┐ ┌──▼────────┐
-   │Auth  │ │App Service│  (Port 3002)
-   │Svc   │ │- Upload   │
-   │      │ │- Fetch    │
-   │3001  │ │- Serve UI │
-   └────┬─┘ └──┬────────┘
-        │      │
-        └──────┼───────────┬──────────┐
-               │           │          │
-        ┌──────▼──┐  ┌─────▼──┐ ┌───▼──┐
-        │ MongoDB  │  │ Redis  │ │ S3   │
-        │(Users,   │  │(Queue) │ │(Imgs)│
-        │Metadata) │  └────────┘ └──────┘
-        └──────────┘
-               ▲
-               │
-        ┌──────┴──────┐
-        │   Worker    │
-        │   Service   │
-        │- Resize     │
-        │- Upload S3  │
-        │- Update DB  │
-        └─────────────┘
+[PLACEHOLDER: Insert Microservices Architecture Diagram]
+- Visual text flow showing Frontend → Gateway → Services → Databases
 ```
 
-## 📦 Services
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     FRONTEND (React)                         │
+│                  http://localhost:8080                       │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+         ┌───────────────┴───────────────┐
+         │   GATEWAY SERVICE (Go/Gin)    │
+         │  Port 8080 - API Routing      │
+         └──────┬──────────────┬──────────┘
+                │              │
+    ┌───────────▼────┐  ┌─────▼──────────────┐
+    │ AUTH SERVICE   │  │  APP SERVICE       │
+    │ Port 3001      │  │  Port 3002         │
+    │ • Register     │  │  • Upload          │
+    │ • Login        │  │  • Gallery         │
+    │ • JWT Tokens   │  │  • Metadata        │
+    └────────┬───────┘  └────────┬───────────┘
+             │                   │
+      ┌──────┴────────┬──────────┴──────────┐
+      │               │                     │
+    ┌─▼────────┐  ┌──▼────┐  ┌────────────▼──┐
+    │ MongoDB  │  │ Redis │  │   AWS S3       │
+    │(Users)   │  │(Queue)│  │  (Images)      │
+    └──────────┘  └───┬───┘  └────────────────┘
+                      │
+             ┌────────▼─────────┐
+             │ WORKER SERVICE   │
+             │ • Resize Images  │
+             │ • Upload to S3   │
+             │ • Update DB      │
+             └──────────────────┘
+```
 
-### 1. **Gateway Service** (Go/Gin)
+### DevOps Architecture
 
-- Entry point for all requests
-- Routes to Auth Service and App Service
-- CORS handling
-- Rate limiting support
-- **Port**: 8080
+```
+[PLACEHOLDER: Insert DevOps Architecture Diagram]
+- Visual showing Local → Jenkins → EKS Cluster → Production
+```
 
-### 2. **Auth Service** (TypeScript/Node.js)
+```
+┌──────────────────────────────────────────────────────────────┐
+│                      GIT REPOSITORY                           │
+│                   (GitHub/GitLab)                             │
+└──────────────────────┬───────────────────────────────────────┘
+                       │ (Webhook Trigger)
+                       │
+         ┌─────────────▼──────────────┐
+         │   JENKINS SERVER (EC2)     │
+         │ • Build Docker Images      │
+         │ • Run Tests                │
+         │ • Push to Registry         │
+         │ • Deploy to EKS            │
+         └──────────┬──────────────────┘
+                    │
+    ┌───────────────┴────────────────┐
+    │      AWS REGION (us-west-2)    │
+    │                                │
+    │  ┌────────────────────────┐   │
+    │  │  VPC (Private Subnets) │   │
+    │  │                        │   │
+    │  │  ┌──────────────────┐  │   │
+    │  │  │   EKS CLUSTER    │  │   │
+    │  │  │ • Master Nodes   │  │   │
+    │  │  │ • Worker Nodes   │  │   │
+    │  │  │ • Auto-scaling   │  │   │
+    │  │  └──────────────────┘  │   │
+    │  │                        │   │
+    │  └────────────────────────┘   │
+    │                                │
+    │  ┌──────────────┐              │
+    │  │  S3 Buckets  │              │
+    │  │  (Images)    │              │
+    │  └──────────────┘              │
+    │                                │
+    └────────────────────────────────┘
+```
 
-- User registration and login
-- JWT token generation (access + refresh tokens)
-- Token verification
-- **Port**: 3001
-- **Database**: MongoDB (auth_db)
+---
 
-### 3. **App Service** (TypeScript/Node.js)
+## 🛠️ Technology Stack
 
-- Image upload handling
-- Frontend serving
-- JWT validation
-- Redis job queue integration
-- Image metadata retrieval
-- **Port**: 3002
-- **Database**: MongoDB (app_db)
-- **Storage**: AWS S3
+### Backend Services
 
-### 4. **Worker Service** (TypeScript/Node.js)
+| Technology             | Usage                       | Version |
+| ---------------------- | --------------------------- | ------- |
+| **TypeScript/Node.js** | Auth, App, Worker Services  | 18+     |
+| **Go (Gin)**           | Gateway Service             | 1.21+   |
+| **Express.js**         | REST API Framework          | 4.x     |
+| **MongoDB**            | User & Image Metadata       | 5.0+    |
+| **Redis**              | Async Job Queue             | 7.0+    |
+| **Sharp**              | Image Processing & Resizing | Latest  |
+| **JWT**                | Authentication Tokens       | -       |
+| **Bcryptjs**           | Password Hashing            | -       |
 
-- Consumes jobs from Redis queue
-- Resizes images using Sharp
-- Uploads all resolutions to S3
-- Updates metadata in MongoDB
-- Scales independently
+### DevOps & Infrastructure
 
-### 5. **Frontend** (React)
+| Technology             | Usage                         | Purpose                |
+| ---------------------- | ----------------------------- | ---------------------- |
+| **Docker**             | Container Runtime             | Local Development      |
+| **Docker Compose**     | Multi-container Orchestration | Local/Staging          |
+| **Kubernetes (EKS)**   | Container Orchestration       | Production             |
+| **Helm**               | Kubernetes Package Manager    | Deployment Management  |
+| **Jenkins**            | CI/CD Pipeline                | Automated Deployments  |
+| **AWS EKS**            | Managed Kubernetes            | Production Cluster     |
+| **AWS EC2**            | Jenkins Server                | Pipeline Execution     |
+| **AWS S3**             | Object Storage                | Image Storage          |
+| **AWS IAM**            | Access Control                | Security & Permissions |
+| **AWS CloudFormation** | Infrastructure as Code        | VPC & Network Setup    |
+| **AWS Autoscaling**    | Dynamic Scaling               | Node & Pod Scaling     |
 
-- User authentication (login/register)
-- Image upload interface
-- Gallery view
-- Resolution selector
-- Polling for job status
+### Frontend
 
-## 🔧 Technology Stack
+| Technology     | Usage                | Version |
+| -------------- | -------------------- | ------- |
+| **React**      | UI Framework         | 18+     |
+| **TypeScript** | Type-safe JavaScript | -       |
+| **Axios**      | HTTP Client          | Latest  |
+| **CSS3**       | Styling              | -       |
 
-| Component        | Technology                    |
-| ---------------- | ----------------------------- |
-| Gateway          | Go (Gin)                      |
-| Services         | TypeScript/Node.js            |
-| Frontend         | React 18                      |
-| Database         | MongoDB                       |
-| Queue            | Redis                         |
-| Storage          | AWS S3                        |
-| Authentication   | JWT (Access + Refresh Tokens) |
-| Image Processing | Sharp (Node.js)               |
+---
+
+## 📚 Documentation Structure
+
+### 1. **README.md** (You are here)
+
+- Project overview
+- Architecture diagrams
+- Technology stack
+- Quick navigation
+- Links to all documentation
+
+### 2. **[APPLICATION_SETUP.md](./APPLICATION_SETUP.md)**
+
+- Local development environment setup
+- Docker & Docker Compose
+- Environment configuration
+- Running services locally
+- Testing the application
+- Troubleshooting
+
+### 3. **[AWS_KUBERNETES_SETUP.md](./AWS_KUBERNETES_SETUP.md)**
+
+- AWS VPC creation using CloudFormation
+- IAM user creation (EKS, Worker, Jenkins)
+- EKS cluster setup with eksctl
+- Node groups and auto-scaling configuration
+- Cluster security and access management
+- Jenkins user access entries
+- Monitoring and cluster management
+
+### 4. **[HELM_KUBERNETES_DEPLOYMENT.md](./HELM_KUBERNETES_DEPLOYMENT.md)**
+
+- Helm charts overview
+- Secrets and values files
+- Deploying to Kubernetes cluster
+- Managing application releases
+- Scaling and updates
+- Health checks and monitoring
+- Troubleshooting deployments
+
+### 5. **[JENKINS_PIPELINE_SETUP.md](./JENKINS_PIPELINE_SETUP.md)**
+
+- Jenkins server installation (EC2)
+- Required tools setup (kubectl, Helm, Docker, AWS CLI)
+- Jenkinsfile configuration
+- Credentials management
+- Pipeline stages and flow
+- CI/CD best practices
+- Troubleshooting pipeline issues
+
+---
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-- Docker & Docker Compose
-- AWS S3 credentials
-- Node.js 18+ (for local development)
-- Go 1.21+ (for gateway local development)
-
-### Environment Setup
-
-1. **Create `.env` file in root directory:**
+### For Local Development
 
 ```bash
-AWS_ACCESS_KEY_ID=your_access_key
-AWS_SECRET_ACCESS_KEY=your_secret_key
-AWS_S3_BUCKET=your-bucket-name
-AWS_S3_REGION=us-east-1
-```
+# 1. Clone and configure
+git clone <repository-url>
+cd microsvc-jenkins-k8s-cicd
+cp .env.example .env
 
-2. **Or use example env files:**
-
-```bash
-cp auth-service/.env.example auth-service/.env
-cp app-service/.env.example app-service/.env
-cp worker-service/.env.example worker-service/.env
-cp gateway-service/.env.example gateway-service/.env
-```
-
-### Running with Docker Compose
-
-```bash
-# Build and start all services
+# 2. Start with Docker Compose
 docker-compose up -d
 
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
-
-# Clean up volumes
-docker-compose down -v
+# 3. Access the application
+open http://localhost:8080
 ```
 
-**Access Points:**
+**→ See [APPLICATION_SETUP.md](./APPLICATION_SETUP.md) for detailed setup instructions**
 
-- **Frontend/App Service**: http://localhost:3002
-- **Gateway**: http://localhost:8080
-- **API Endpoints**: http://localhost:8080/api/\*
-- **MongoDB**: mongodb://localhost:27017
-- **Redis**: redis://localhost:6379
-
-### Local Development
-
-#### Auth Service
+### For Production Deployment on AWS EKS
 
 ```bash
-cd auth-service
-npm install
-npm run dev
+# 1. Set up AWS Infrastructure
+# See [AWS_KUBERNETES_SETUP.md](./AWS_KUBERNETES_SETUP.md)
+
+# 2. Deploy with Helm
+helm install app ./helm/app-service -f helm/values/app-service.yaml
+
+# 3. Access via LoadBalancer
+kubectl get svc -n microservices
 ```
 
-#### App Service
+**→ See [HELM_KUBERNETES_DEPLOYMENT.md](./HELM_KUBERNETES_DEPLOYMENT.md) for full deployment guide**
+
+### For CI/CD with Jenkins
 
 ```bash
-cd app-service
-npm install
-npm run dev
+# 1. Set up Jenkins on EC2
+# See [JENKINS_PIPELINE_SETUP.md](./JENKINS_PIPELINE_SETUP.md)
+
+# 2. Configure pipeline
+# Create Jenkins credentials and pipeline job
+
+# 3. Trigger deployments
+# Push to repository → Webhook → Jenkins → EKS
 ```
 
-#### Worker Service
+**→ See [JENKINS_PIPELINE_SETUP.md](./JENKINS_PIPELINE_SETUP.md) for complete setup**
 
-```bash
-cd worker-service
-npm install
-npm run dev
+---
+
+## 📦 Services Overview
+
+### 1. **Gateway Service** (Go/Gin)
+
+- **Purpose**: API Gateway & Request Router
+- **Port**: 8080
+- **Responsibilities**:
+  - Route requests to Auth & App services
+  - CORS handling
+  - Rate limiting
+  - Frontend serving fallthrough
+
+### 2. **Auth Service** (TypeScript/Node.js)
+
+- **Purpose**: User Authentication & JWT Management
+- **Port**: 3001
+- **Responsibilities**:
+  - User registration with password hashing
+  - Login with access/refresh tokens
+  - Token verification
+  - JWT token generation and validation
+
+### 3. **App Service** (TypeScript/Node.js)
+
+- **Purpose**: Image Upload & Gallery Management
+- **Port**: 3002
+- **Responsibilities**:
+  - Image upload handling
+  - Image metadata storage
+  - Gallery listing and filtering
+  - Redis job queue integration
+  - Frontend hosting
+  - Status polling
+
+### 4. **Worker Service** (TypeScript/Node.js)
+
+- **Purpose**: Background Image Processing
+- **No exposed port** (internal service)
+- **Responsibilities**:
+  - Consume Redis queue jobs
+  - Resize images with Sharp (5 resolutions)
+  - Upload to AWS S3
+  - Update metadata in MongoDB
+  - Error handling & retry logic
+
+### 5. **Frontend** (React)
+
+- **Purpose**: User Interface
+- **Served by**: App Service on port 3002
+- **Features**:
+  - User authentication (login/register)
+  - Image upload with drag-and-drop
+  - Gallery with grid view
+  - Resolution selector
+  - Real-time status polling
+
+---
+
+## 🔐 Image Processing Flow
+
+```
+1. USER UPLOADS IMAGE
+   ↓
+2. FRONTEND SENDS TO APP SERVICE (with JWT)
+   ↓
+3. APP SERVICE VALIDATES JWT
+   ↓
+4. SAVE ORIGINAL TO AWS S3
+   ↓
+5. CREATE METADATA IN MONGODB (status: pending)
+   ↓
+6. PUSH JOB TO REDIS QUEUE
+   ↓
+7. RETURN JOB ID TO FRONTEND (status: pending)
+   ↓
+8. WORKER SERVICE POLLS QUEUE
+   ↓
+9. RESIZE TO 5 RESOLUTIONS USING SHARP
+   - Thumbnail (150x150)
+   - Small (480x480)
+   - Medium (1024x1024)
+   - Large (1920x1920)
+   - Original (as-is)
+   ↓
+10. UPLOAD ALL RESOLUTIONS TO S3
+    ↓
+11. UPDATE MONGODB WITH URLS (status: complete)
+    ↓
+12. FRONTEND POLLS & DISPLAYS GALLERY
+    ↓
+13. USER SELECTS RESOLUTION TO VIEW
 ```
 
-#### Gateway Service
+---
 
-```bash
-cd gateway-service
-go mod download
-go run main.go
-```
+## 📊 Key Features
 
-#### Frontend
+### ✨ Application Features
 
-```bash
-cd frontend
-npm install
-npm start
-```
+- **Multi-Resolution Processing**: Automatic generation of 5 image sizes
+- **Async Processing**: Non-blocking image processing with job queue
+- **Real-time Status**: Live status updates as images are processed
+- **User Authentication**: Secure JWT-based authentication
+- **Image Gallery**: Responsive gallery with resolution selector
+- **Cloud Storage**: AWS S3 integration for scalable storage
 
-## 📋 API Endpoints
+### 🔧 DevOps Features
 
-### Authentication
+- **Containerization**: Docker multi-stage builds for optimization
+- **Orchestration**: Kubernetes for production deployments
+- **Infrastructure as Code**: CloudFormation for VPC setup
+- **CI/CD Pipeline**: Jenkins automated deployments
+- **Package Management**: Helm charts for Kubernetes
+- **Auto-scaling**: Horizontal pod and node auto-scaling
+- **Security**: IAM policies, secrets management
+- **Monitoring**: Health checks and logging
 
-**Register User**
+---
 
-```http
-POST /api/auth/register
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-
-Response:
-{
-  "message": "User registered successfully",
-  "userId": "user_id",
-  "email": "user@example.com",
-  "accessToken": "token",
-  "refreshToken": "refresh_token"
-}
-```
-
-**Login**
-
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-
-Response:
-{
-  "message": "Login successful",
-  "userId": "user_id",
-  "email": "user@example.com",
-  "accessToken": "token",
-  "refreshToken": "refresh_token"
-}
-```
-
-**Refresh Token**
-
-```http
-POST /api/auth/refresh
-Content-Type: application/json
-
-{
-  "refreshToken": "refresh_token"
-}
-
-Response:
-{
-  "message": "Tokens refreshed",
-  "accessToken": "new_token",
-  "refreshToken": "new_refresh_token"
-}
-```
-
-### Image Operations
-
-**Upload Image**
-
-```http
-POST /api/images/upload
-Authorization: Bearer <accessToken>
-Content-Type: multipart/form-data
-
-Form Data:
-- image: <file>
-
-Response:
-{
-  "message": "Image upload accepted for processing",
-  "imageId": "image_id",
-  "jobId": "job_id",
-  "status": "pending"
-}
-```
-
-**List User Images**
-
-```http
-GET /api/images
-Authorization: Bearer <accessToken>
-
-Response:
-{
-  "images": [
-    {
-      "id": "image_id",
-      "originalName": "photo.jpg",
-      "status": "complete",
-      "uploadedAt": "2025-12-09T10:30:00Z",
-      "processedAt": "2025-12-09T10:30:15Z"
-    }
-  ]
-}
-```
-
-**Get Image Details**
-
-```http
-GET /api/images/:id
-Authorization: Bearer <accessToken>
-
-Response:
-{
-  "id": "image_id",
-  "originalName": "photo.jpg",
-  "status": "complete",
-  "sizes": {
-    "thumbnail": {
-      "url": "https://s3.amazonaws.com/...",
-      "width": 150,
-      "height": 150,
-      "size": "15KB"
-    },
-    "small": {
-      "url": "https://s3.amazonaws.com/...",
-      "width": 480,
-      "height": 480,
-      "size": "85KB"
-    },
-    "medium": {
-      "url": "https://s3.amazonaws.com/...",
-      "width": 1024,
-      "height": 1024,
-      "size": "350KB"
-    },
-    "large": {
-      "url": "https://s3.amazonaws.com/...",
-      "width": 1920,
-      "height": 1920,
-      "size": "1.2MB"
-    },
-    "original": {
-      "url": "https://s3.amazonaws.com/...",
-      "width": 4032,
-      "height": 3024,
-      "size": "3.5MB"
-    }
-  },
-  "uploadedAt": "2025-12-09T10:30:00Z",
-  "processedAt": "2025-12-09T10:30:15Z"
-}
-```
-
-**Check Image Processing Status**
-
-```http
-GET /api/images/:id/status
-Authorization: Bearer <accessToken>
-
-Response:
-{
-  "id": "image_id",
-  "status": "complete",
-  "errorMessage": null
-}
-```
-
-## 🔐 Authentication Flow
-
-1. **User Registration/Login**
-
-   - User provides email and password
-   - Auth Service validates and returns `accessToken` and `refreshToken`
-
-2. **Token Storage**
-
-   - Frontend stores tokens in localStorage (header-based, no cookies)
-   - `Authorization: Bearer <accessToken>` sent with each request
-
-3. **Token Refresh**
-
-   - Access token expires in 15 minutes
-   - When expired, frontend uses refresh token to get new access token
-   - Refresh token expires in 7 days
-
-4. **Verification**
-   - App Service verifies token with Auth Service for each request
-   - Invalid/expired tokens return 401 Unauthorized
-
-## 📸 Image Processing Flow
-
-1. **Upload**
-
-   - Frontend sends image to App Service with JWT
-   - App Service saves original to S3
-   - Creates MongoDB metadata document with `status: pending`
-   - Pushes job to Redis queue
-   - Returns immediately with `jobId`
-
-2. **Processing**
-
-   - Worker Service polls Redis queue
-   - Downloads original from S3
-   - Resizes to 5 resolutions using Sharp
-   - Uploads all versions to S3
-   - Updates MongoDB with all URLs and metadata
-   - Sets job status to `complete`
-
-3. **Retrieval**
-   - Frontend polls image status endpoint
-   - When complete, fetches full image metadata
-   - Displays gallery with resolution selector
-   - User can view any resolution
-
-## 📁 Directory Structure
+## 🗂️ Project Structure
 
 ```
 microsvc-jenkins-k8s-cicd/
-├── auth-service/
+│
+├── README.md                          # Main documentation (you are here)
+├── APPLICATION_SETUP.md               # Local development guide
+├── AWS_KUBERNETES_SETUP.md            # AWS & EKS setup guide
+├── HELM_KUBERNETES_DEPLOYMENT.md      # Helm deployment guide
+├── JENKINS_PIPELINE_SETUP.md          # Jenkins CI/CD guide
+│
+├── 🔐 auth-service/                   # Authentication service
 │   ├── src/
-│   │   ├── config/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── utils/
+│   │   ├── config/database.ts
+│   │   ├── models/User.ts
+│   │   ├── routes/auth.ts
+│   │   ├── utils/jwt.ts
 │   │   └── index.ts
-│   ├── package.json
-│   ├── tsconfig.json
 │   ├── Dockerfile
-│   └── .env.example
-├── app-service/
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── 📸 app-service/                    # Main application service
 │   ├── src/
-│   │   ├── config/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── middleware/
+│   │   ├── config/database.ts
+│   │   ├── models/ImageMetadata.ts
+│   │   ├── routes/images.ts
+│   │   ├── middleware/auth.ts
 │   │   ├── utils/
+│   │   │   ├── s3.ts
+│   │   │   ├── redis.ts
+│   │   │   └── auth.ts
+│   │   ├── public/ (frontend build)
 │   │   └── index.ts
-│   ├── package.json
-│   ├── tsconfig.json
 │   ├── Dockerfile
-│   └── .env.example
-├── worker-service/
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── ⚙️ worker-service/                 # Image processing worker
 │   ├── src/
-│   │   ├── config/
-│   │   ├── models/
+│   │   ├── config/database.ts
+│   │   ├── models/ImageMetadata.ts
 │   │   ├── utils/
+│   │   │   ├── s3.ts
+│   │   │   ├── redis.ts
+│   │   │   └── imageProcessor.ts
 │   │   └── index.ts
-│   ├── package.json
-│   ├── tsconfig.json
 │   ├── Dockerfile
-│   └── .env.example
-├── gateway-service/
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── 🌐 gateway-service/                # API Gateway (Go)
 │   ├── main.go
 │   ├── go.mod
-│   ├── Dockerfile
-│   └── .env.example
-├── frontend/
+│   └── Dockerfile
+│
+├── 🎨 frontend/                       # React application
 │   ├── public/
+│   │   └── index.html
 │   ├── src/
 │   │   ├── components/
-│   │   ├── styles/
+│   │   │   ├── Login.tsx
+│   │   │   ├── Register.tsx
+│   │   │   ├── ImageUpload.tsx
+│   │   │   └── ImageGallery.tsx
 │   │   ├── App.tsx
-│   │   └── index.tsx
-│   ├── package.json
+│   │   ├── index.tsx
+│   │   └── styles/
 │   ├── Dockerfile
+│   ├── package.json
 │   └── tsconfig.json
-├── shared/
+│
+├── 📦 shared/                         # Shared types
 │   └── types.ts
-├── docker-compose.yml
-└── README.md
+│
+├── ⚙️ helm/                           # Kubernetes Helm charts
+│   ├── Chart.yaml
+│   ├── namespace.yaml
+│   ├── initial_install_script.sh
+│   ├── app-service/Chart.yaml
+│   ├── auth-service/Chart.yaml
+│   ├── gateway-service/Chart.yaml
+│   ├── worker-service/Chart.yaml
+│   ├── values/
+│   │   ├── app-service.yaml
+│   │   ├── auth-service.yaml
+│   │   ├── gateway-service.yaml
+│   │   ├── worker-service.yaml
+│   │   ├── mongo.yaml
+│   │   └── redis.yaml
+│   └── secrets/
+│       ├── app-service-secrets.yaml
+│       ├── auth-service-secrets.yaml
+│       ├── gateway-service-secrets.yaml
+│       ├── mongo-secrets.yaml
+│       └── redis-secrets.yaml
+│
+├── docker-compose.yml                 # Local development orchestration
+└── Jenkinsfile                        # CI/CD pipeline definition
 ```
 
-## 🔄 Data Models
+---
 
-### User (MongoDB - auth_db)
+## 🔑 Key Concepts Demonstrated
 
-```json
-{
-  "_id": ObjectId,
-  "email": "string (unique)",
-  "password": "string (hashed)",
-  "createdAt": "Date"
-}
-```
+### DevOps
 
-### ImageMetadata (MongoDB - app_db)
+- **Infrastructure as Code**: CloudFormation for VPC setup
+- **Configuration Management**: Helm values and secrets
+- **Continuous Integration**: Jenkins automated builds
+- **Continuous Deployment**: Auto-deployment to EKS
+- **Container Orchestration**: Kubernetes for scalability
+- **Monitoring & Logging**: Health checks and logs
 
-```json
-{
-  "_id": "string (UUID)",
-  "userId": "string",
-  "originalName": "string",
-  "status": "pending|processing|complete|failed",
-  "sizes": {
-    "thumbnail": {
-      "url": "string",
-      "width": number,
-      "height": number,
-      "size": "string"
-    },
-    "small": {...},
-    "medium": {...},
-    "large": {...},
-    "original": {...}
-  },
-  "uploadedAt": "Date",
-  "processedAt": "Date",
-  "errorMessage": "string (optional)"
-}
-```
+### AWS Services
 
-### ResizeJob (Redis Queue)
+- **EKS**: Managed Kubernetes cluster
+- **EC2**: Jenkins server
+- **S3**: Image storage
+- **IAM**: User and role management
+- **CloudFormation**: Infrastructure setup
+- **VPC**: Private network with security groups
+- **Auto Scaling Groups**: Dynamic node scaling
 
-```json
-{
-  "jobId": "string (UUID)",
-  "imageId": "string",
-  "userId": "string",
-  "originalPath": "string (S3 key)",
-  "originalName": "string",
-  "timestamp": "number"
-}
-```
+### Microservices Patterns
 
-## 🎯 Image Resolutions
+- **API Gateway Pattern**: Gateway service for routing
+- **Service-to-Service Communication**: Internal service mesh
+- **Async Processing**: Job queue with workers
+- **Database per Service**: Separate MongoDB collections
+- **Health Checks**: Readiness and liveness probes
+- **Circuit Breaker**: Error handling strategies
 
-| Resolution    | Dimensions | Use Case          |
-| ------------- | ---------- | ----------------- |
-| **Thumbnail** | 150x150    | Gallery preview   |
-| **Small**     | 480x480    | Mobile view       |
-| **Medium**    | 1024x1024  | Web view          |
-| **Large**     | 1920x1920  | High-res display  |
-| **Original**  | As-is      | Download full res |
+---
 
-## 🔍 Monitoring & Debugging
+## 📖 Documentation Navigation
 
-### View Service Logs
+| Document                          | Purpose                         | For              |
+| --------------------------------- | ------------------------------- | ---------------- |
+| **README.md**                     | Project overview & architecture | Everyone         |
+| **APPLICATION_SETUP.md**          | Local development               | Developers       |
+| **AWS_KUBERNETES_SETUP.md**       | Cloud infrastructure            | DevOps Engineers |
+| **HELM_KUBERNETES_DEPLOYMENT.md** | Production deployment           | DevOps Engineers |
+| **JENKINS_PIPELINE_SETUP.md**     | CI/CD automation                | DevOps Engineers |
 
-```bash
-# All services
-docker-compose logs -f
+---
 
-# Specific service
-docker-compose logs -f worker-service
+## 🎯 Learning Path
 
-# Last 100 lines
-docker-compose logs --tail=100 auth-service
-```
+### Beginner: Understanding the Application
 
-### Check Service Health
+1. Read this README
+2. Follow [APPLICATION_SETUP.md](./APPLICATION_SETUP.md)
+3. Run application locally with Docker Compose
+4. Test API endpoints
+5. Explore the codebase
 
-```bash
-# Auth Service
-curl http://localhost:3001/health
+### Intermediate: Cloud & Kubernetes
 
-# App Service
-curl http://localhost:3002/api/health
+1. Read [AWS_KUBERNETES_SETUP.md](./AWS_KUBERNETES_SETUP.md)
+2. Create AWS account and infrastructure
+3. Read [HELM_KUBERNETES_DEPLOYMENT.md](./HELM_KUBERNETES_DEPLOYMENT.md)
+4. Deploy to EKS cluster
+5. Monitor and manage deployments
 
-# Gateway
-curl http://localhost:8080/health
-```
+### Advanced: CI/CD & Automation
 
-### MongoDB Queries
+1. Read [JENKINS_PIPELINE_SETUP.md](./JENKINS_PIPELINE_SETUP.md)
+2. Set up Jenkins on EC2
+3. Configure pipeline and credentials
+4. Implement automated deployments
+5. Optimize and monitor pipeline
 
-```bash
-docker-compose exec mongo mongosh
+---
 
-# Switch database
-use auth_db
-use app_db
+## 🌟 Real-World Use Cases
 
-# List collections
-show collections
+This project demonstrates:
 
-# Find users
-db.users.find()
+✅ **Multi-tier Microservices**: Authentication, API, Worker services  
+✅ **Async Job Processing**: Image resizing with queue  
+✅ **Cloud Integration**: AWS S3 storage  
+✅ **Container Orchestration**: Kubernetes deployments  
+✅ **CI/CD Automation**: Jenkins pipeline  
+✅ **Infrastructure as Code**: CloudFormation & Helm  
+✅ **Security**: IAM, secrets, authentication  
+✅ **Scalability**: Auto-scaling pods and nodes
 
-# Find images
-db.imagemetadatas.find()
-```
+---
 
-### Redis Inspection
+## 🐛 Troubleshooting Quick Guide
 
-```bash
-docker-compose exec redis redis-cli
+### Docker issues?
 
-# Check queue
-LLEN resize-queue
+→ See [APPLICATION_SETUP.md - Troubleshooting](./APPLICATION_SETUP.md#troubleshooting)
 
-# View job
-GET job:<jobId>
-```
+### AWS/EKS issues?
 
-## 🚀 Scaling Considerations
+→ See [AWS_KUBERNETES_SETUP.md - Troubleshooting](./AWS_KUBERNETES_SETUP.md#troubleshooting)
 
-1. **Multiple Workers**
+### Deployment issues?
 
-   - Run multiple worker instances for parallel processing
-   - Redis queue automatically distributes jobs
+→ See [HELM_KUBERNETES_DEPLOYMENT.md - Troubleshooting](./HELM_KUBERNETES_DEPLOYMENT.md#troubleshooting)
 
-2. **Load Balancing**
+### Pipeline issues?
 
-   - Use nginx or AWS ALB in front of Gateway
-   - Distribute traffic across multiple Gateway instances
+→ See [JENKINS_PIPELINE_SETUP.md - Troubleshooting](./JENKINS_PIPELINE_SETUP.md#troubleshooting)
 
-3. **Database**
-
-   - Use MongoDB Atlas for cloud hosting
-   - Add indices for frequently queried fields
-
-4. **S3**
-
-   - Use CloudFront for CDN caching
-   - Enable S3 transfer acceleration
-
-5. **Kubernetes Deployment**
-   - Services ready for K8s deployment
-   - StatefulSet for MongoDB
-   - Deployment for microservices
-
-## 🐛 Troubleshooting
-
-### Images not processing
-
-1. Check Worker logs: `docker-compose logs worker-service`
-2. Verify Redis connection: `docker-compose exec redis redis-cli ping`
-3. Check job in queue: `docker-compose exec redis redis-cli LLEN resize-queue`
-
-### S3 upload failures
-
-1. Verify AWS credentials in `.env`
-2. Check S3 bucket exists and is accessible
-3. Verify IAM permissions for S3 access
-
-### Auth failures
-
-1. Check MongoDB connection
-2. Verify JWT secrets are set correctly
-3. Check token expiration times
+---
 
 ## 📝 Environment Variables
 
-### Auth Service
+Each service requires environment configuration. See respective setup guides:
 
-- `MONGODB_URI` - MongoDB connection string
-- `JWT_SECRET` - Access token signing key (min 32 chars)
-- `JWT_REFRESH_SECRET` - Refresh token signing key (min 32 chars)
-- `JWT_ACCESS_EXPIRE` - Access token expiration (default: 15m)
-- `JWT_REFRESH_EXPIRE` - Refresh token expiration (default: 7d)
+- **Local Development**: [APPLICATION_SETUP.md](./APPLICATION_SETUP.md)
+- **Kubernetes Secrets**: [HELM_KUBERNETES_DEPLOYMENT.md](./HELM_KUBERNETES_DEPLOYMENT.md)
 
-### App Service
+Key variables:
 
-- `MONGODB_URI` - MongoDB connection string
-- `REDIS_HOST` - Redis host
-- `REDIS_PORT` - Redis port
-- `AUTH_SERVICE_URL` - Auth Service URL
-- `AWS_ACCESS_KEY_ID` - AWS credentials
-- `AWS_SECRET_ACCESS_KEY` - AWS credentials
-- `AWS_S3_BUCKET` - S3 bucket name
-- `AWS_S3_REGION` - AWS region
+- `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` (AWS credentials)
+- `JWT_SECRET`, `JWT_REFRESH_SECRET` (Authentication)
+- `MONGODB_URI` (Database connection)
+- `REDIS_HOST`, `REDIS_PORT` (Queue service)
 
-### Worker Service
+---
 
-- Same as App Service (MongoDB, Redis, AWS)
+## 🔒 Security Considerations
 
-### Gateway Service
+- ✅ JWT tokens for stateless authentication
+- ✅ Password hashing with bcrypt
+- ✅ IAM policies for AWS access control
+- ✅ Kubernetes secrets for sensitive data
+- ✅ Network policies for service isolation
+- ✅ HTTPS/TLS ready configuration
+- ✅ Environment-based configuration
 
-- `AUTH_SERVICE_URL` - Auth Service URL
-- `APP_SERVICE_URL` - App Service URL
+---
 
-## 📚 API Response Codes
+## 📊 API Endpoints
 
-| Code | Meaning                     |
-| ---- | --------------------------- |
-| 200  | Success                     |
-| 201  | Created                     |
-| 202  | Accepted (async processing) |
-| 400  | Bad Request                 |
-| 401  | Unauthorized                |
-| 409  | Conflict (user exists)      |
-| 500  | Server Error                |
+### Authentication Endpoints
 
-## 🔐 Security Notes
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - User login
+- `POST /api/auth/refresh` - Refresh JWT tokens
 
-1. Change all default JWT secrets in production
-2. Use environment variables for sensitive data
-3. Enable HTTPS/TLS for all services
-4. Implement rate limiting properly
-5. Add request validation on all endpoints
-6. Use AWS S3 bucket policies to restrict access
-7. Enable MongoDB authentication
-8. Use Redis AUTH in production
+### Image Endpoints
 
-## 📄 License
+- `POST /api/images/upload` - Upload image
+- `GET /api/images` - List user images
+- `GET /api/images/:id` - Get image details
+- `GET /api/images/:id/status` - Check processing status
 
-MIT
+---
 
 ## 🤝 Contributing
 
 1. Create feature branches
-2. Follow TypeScript best practices
-3. Add unit tests
+2. Follow TypeScript/Go best practices
+3. Add appropriate tests
 4. Submit pull requests
 
-## 📞 Support
+---
 
-For issues and questions, please open an issue on the repository.
+## 📄 License
+
+MIT License - See LICENSE file for details
+
+---
+
+## 📞 Support & Questions
+
+- Review relevant documentation guide
+- Check troubleshooting sections
+- Examine logs and error messages
+- Verify configuration files
+
+---
+
+**Project Status**: ✅ Production Ready  
+**Last Updated**: January 2026  
+**Version**: 1.0.0
+
+---
+
+### 🗺️ Next Steps
+
+Choose your path:
+
+- 👨‍💻 **Developer?** → Go to [APPLICATION_SETUP.md](./APPLICATION_SETUP.md)
+- 🚀 **DevOps Engineer?** → Go to [AWS_KUBERNETES_SETUP.md](./AWS_KUBERNETES_SETUP.md)
+- 🔄 **Setting up CI/CD?** → Go to [JENKINS_PIPELINE_SETUP.md](./JENKINS_PIPELINE_SETUP.md)
+- 📦 **Managing production?** → Go to [HELM_KUBERNETES_DEPLOYMENT.md](./HELM_KUBERNETES_DEPLOYMENT.md)
