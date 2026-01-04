@@ -2,7 +2,7 @@
 
 > **A complete DevOps learning platform** demonstrating modern cloud-native application architecture with AWS, Kubernetes, Jenkins, Docker, and Helm.
 
-![Status](https://img.shields.io/badge/Status-Production%20Ready-green) ![License](https://img.shields.io/badge/License-MIT-blue) ![Version](https://img.shields.io/badge/Version-1.0.0-blue)
+![Status](https://img.shields.io/badge/Status-Production%20Ready-green) 
 
 ---
 
@@ -23,11 +23,11 @@ The project is **designed specifically for learning DevOps, AWS, and Kubernetes*
 
 ## 🏗️ Architecture Overview
 
+### DevOps Architecture
+
+![DevOps Architecture Diagram](./assets/architecture_diagram.png)
+
 ### Microservices Architecture
-
-```
-
-```
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -62,10 +62,6 @@ The project is **designed specifically for learning DevOps, AWS, and Kubernetes*
              │ • Update DB      │
              └──────────────────┘
 ```
-
-### DevOps Architecture
-
-![DevOps Architecture Diagram](./assets/architecture_diagram.png)
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
