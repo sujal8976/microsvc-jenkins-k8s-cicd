@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/database";
 import { connectRedis } from "./utils/redis";
 import imageRoutes from "./routes/images";
+import { metricsMiddleware, metricsRouter } from "./routes/metrics";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ const frontendPath = path.join(
 
 // Middleware
 app.use(express.json());
+app.use(metricsMiddleware);
 app.use(express.static(frontendPath));
 
 // Database and Redis connections
@@ -24,6 +26,7 @@ connectRedis();
 
 // API Routes
 app.use("/api/images", imageRoutes);
+app.use("/metrics", metricsRouter);
 
 // Health check
 app.get("/api/health", (req, res) => {
